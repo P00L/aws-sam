@@ -1,0 +1,4 @@
+pytest-mock
+pytest
+aws-sam-cli
+awscli
