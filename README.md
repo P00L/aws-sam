@@ -16,6 +16,7 @@ For details:
 - [pytest](https://docs.pytest.org/en/latest/)
 - [AWS CLI](https://docs.aws.amazon.com/en_us/cli/latest/userguide/cli-chap-install.html)
 - [AWS SAM CLI](https://docs.aws.amazon.com/en_us/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html)
+- [Docker](https://www.docker.com/) unfortunately AWS SAM needs docker to spin up a container running locally your function with respect to competitors like serverless framework thatn don't
 - [AWS Toolkit for PyCharm](https://aws.amazon.com/it/pycharm/)
 
 Now that your local environment has been set you can [initialize](https://docs.aws.amazon.com/en_us/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-init.html) you first AWS SAM project 
@@ -28,7 +29,7 @@ File --> New Project... --> AWS Serverless Application
 ```
 ![PycCharm create project](images/pycharm_create_project.png)
 
-This command is very helpful since create the skeleton of yor project 
+This command is very helpful since create the skeleton of your project 
 
 ```bash
 .
@@ -112,27 +113,105 @@ Folder `hello_world` in your project became folder `HelloWorldFunction` like the
 
 Each of your lambda folder must contain a `requirements.txt` file specifying required dependencies, you will have so
 maximum granularity specifying dependencies for each function but AWS SAM will have to install the dependencies for each 
-lambda resulting in longer build time if your template contains an high number of lambda function.
-TODO controllare se installa davvero per ogni requirments 
+lambda resulting in longer build time if your template contains an high number of lambda function. 
 
-Keep also in mind that all the content of the folder you specify in `CodeUri` will be packaged for your lambda counting 
-in the size limit of lambda deployment package.     
+Keep also in mind that all the content of the folder you specify in `CodeUri` will be packaged for your lambda, counting 
+in the size limit of lambda deployment package.  
+   
 ## Package
 Now that all our dependencies have been downloaded we want to package all in way AWS lambda will accept our code.
-AWS SAM is an optimized cloudformation for serverless application so it come with all the benefits (and drawback) of cloudformation.
+AWS SAM is an optimized cloudformation for serverless application so it come with all the benefits (and pains) of cloudformation.
 One of the greatest advantage it's the possibility to use the built-in [package](https://docs.aws.amazon.com/en_us/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-package.html)
 command.
-TODO controllare se funziona prefix
 ```bash
 sam package --template-file .aws-sam/build/template.yaml --s3-bucket artifact-bucket --s3-prefix aws-sam/versions/1 --output-template-file .aws-sam/build/template-packaged.yaml
 ```
+This command package all your code, upload it on S3 and update your template `CodeUri` with the correct S3 key.
+
+I suggest you to take advantage of the `--s3-prefix` parameter to create a clean structure also for yuor deployments,
+otherwise you will end with all your package in the root of your S3 bucket.
+
+Our packaged template will look like this
+```yaml
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'sam-app
+
+  Sample SAM Template for sam-app
+
+  '
+Globals:
+  Function:
+    Timeout: 3
+Outputs:
+  HelloWorldApi:
+    Description: API Gateway endpoint URL for Prod stage for Hello World function
+    Value:
+      Fn::Sub: https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/
+  HelloWorldFunction:
+    Description: Hello World Lambda Function ARN
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunction
+      - Arn
+  HelloWorldFunctionIamRole:
+    Description: Implicit IAM Role created for Hello World function
+    Value:
+      Fn::GetAtt:
+      - HelloWorldFunctionRole
+      - Arn
+Resources:
+  HelloWorldFunction:
+    Properties:
+      CodeUri: s3://artifact-bucket/aws-sam/versions/1/b891a08245ed5940781e64b483cbcb14
+      Events:
+        HelloWorld:
+          Properties:
+            Method: get
+            Path: /hello
+          Type: Api
+      Handler: app.lambda_handler
+      Runtime: python3.7
+    Type: AWS::Serverless::Function
+Transform: AWS::Serverless-2016-10-31
+```
+As you can see `CodeUri` path now points to an S3 key, containing our package.
 
 ## Deploy
+It's now time to see our application working for real.
+As stated before we can use the utilities of cloudformation in particular we can leverage [deploy](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-deploy.html) command
 ```bash
-sam deploy --stack-name hello-world-layer --template-file .aws-sam/build/template-packaged.yaml --capabilities CAPABILITY_IAM
+sam deploy --stack-name hello-world-sam --template-file .aws-sam/build/template-packaged.yaml --capabilities CAPABILITY_IAM
 ```
+As you can see we are telling sam to deploy our `template-packaged.yaml` template, the one generated from package command,
+Cloudformation will read the template and create all the resource defined within it.
+
+We can check the correct deployment from aws cloudfromation console
+
+![PycCharm create project](images/cloudformation.png)
 
 ## Test
+Till now we have assumed all our code and configurations are correct, once deployed all will work like a charm...but usually it's not the case,
+testing it's always an important step to keep in mind when your are developing an application. In the world of serverless 
+testing strategies has changed a little focusing more on the integration rater than unit introducing new challenges.
+Try to define a testing strategies for all the components of your application from template passing through the code till the 
+roles your function will have once deployed.
 
+AWS SAM comes with many utilities for testing an application. Let's start with [local invoke](https://docs.aws.amazon.com/en_us/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html)
+command that ket you invoke locally your lambda handler with a mocked event.
 
+```
+sam local invoke --event event.json
+```
 
+You can also invoke your function directly from the template within Pycharm with the AWS Toolkit 
+![PycCharm create project](images/pycharm_sam_invoke.png)
+
+If you have created the project from CLI or you have added new function and you try to run a function you may incur in the following error
+
+![PycCharm create project](images/pycharm_error.png)
+
+This problem can be easily solved adding the folder marking your function as **source root**
+
+![PycCharm create project](images/pycharm_source_root.png)
+
+Another useful utility it's the possibility to locally start an API gateway
