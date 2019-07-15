@@ -93,7 +93,7 @@ Outputs:
 ## Build
 For building dependencies AWS SAM CLI comes with a built-in [build](https://docs.aws.amazon.com/en_us/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-build.html) command 
 ```bash
-sam build
+sam build --template template.yaml
 ```
 
 The command will create a `.aws-sam` folder containing your code packaged with dependencies installed from `requirements.txt`
@@ -192,19 +192,32 @@ We can check the correct deployment from aws cloudfromation console
 ## Test
 Till now we have assumed all our code and configurations are correct, once deployed all will work like a charm...but usually it's not the case,
 testing it's always an important step to keep in mind when your are developing an application. In the world of serverless 
-testing strategies has changed a little focusing more on the integration rater than unit introducing new challenges.
+testing strategies has changed a little focusing more on the integration rather than unit introducing new challenges.
 Try to define a testing strategies for all the components of your application from template passing through the code till the 
 roles your function will have once deployed.
 
-AWS SAM comes with many utilities for testing an application. Let's start with [local invoke](https://docs.aws.amazon.com/en_us/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html)
-command that ket you invoke locally your lambda handler with a mocked event.
+AWS SAM comes with many utilities for testing an application, let's start with [validate](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-validate.html)
+command, utility letting you check whenever your template is syntactically valid.
 
+```bash
+sam validate --template template.yaml
 ```
+
+Passing to code we can use [local invoke](https://docs.aws.amazon.com/en_us/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-invoke.html)
+command that let you invoke locally your lambda handler with a mocked event.
+
+```bash
 sam local invoke --event event.json
 ```
 
 You can also invoke your function directly from the template within Pycharm with the AWS Toolkit 
+
 ![PycCharm create project](images/pycharm_sam_invoke.png)
+
+And from Run/Debug configuration you can set basic information like AWS credential to be used, automatically loaded from [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html) configuration. 
+
+![PycCharm create project](images/pycharm_run_config.png)
+
 
 If you have created the project from CLI or you have added new function and you try to run a function you may incur in the following error
 
@@ -214,4 +227,46 @@ This problem can be easily solved adding the folder marking your function as **s
 
 ![PycCharm create project](images/pycharm_source_root.png)
 
-Another useful utility it's the possibility to locally start an API gateway
+Another useful utility it's the possibility to [locally start](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/sam-cli-command-reference-sam-local-start-api.html) 
+an API gateway hosting all your function
+
+```bash
+sam local start-api 
+```
+Now you can locally invoke your HTTP endpoint, with an API manager like [Postman](https://www.getpostman.com/).
+
+If your want to test your function within python you can use one of the testing libraries supported and locally invoke un lambda handler function.
+AWS SAM init preconfigure for you a `tests` folder containing an example.
+Here i reported a slightly different version leveraging the  `event.json` file instead of generating event directly from code.
+
+```python
+import json
+import pytest
+from hello_world import app
+
+
+@pytest.fixture()
+def apigw_event():
+    """ Generates API GW Event"""
+    with open("../../event.json") as json_file:
+        return json.load(json_file)
+
+
+def test_lambda_handler(apigw_event, mocker):
+    ret = app.lambda_handler(apigw_event, "")
+    data = json.loads(ret["body"])
+
+    assert ret["statusCode"] == 200
+    assert "message" in ret["body"]
+    assert data["message"] == "hello world!"
+    # assert "location" in data.dict_keys()
+```
+
+If you are experiencing problems with import of your function from test folder check if [sys path](https://leemendelowitz.github.io/blog/how-does-python-find-packages.html)
+are correctly set.
+
+## Next step
+
+In the second part we will dig into detail of using a lambda layer in particular we will point the attention on how to test 
+it locally.
+Third part will cover in detail how to embed the deployment of our application in a CI/CD release pipeline with codecommit, codebuild and codedeploy
