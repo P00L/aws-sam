@@ -23,12 +23,6 @@ Resources:
           Properties:
             Path: /hello
             Method: get
-  HelloWorldLayer:
-    Type: 'AWS::Serverless::LayerVersion'
-    Properties:
-      ContentUri: ./layer/
-      CompatibleRuntimes: # optional
-        - python3.7
 
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
