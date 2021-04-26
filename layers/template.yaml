@@ -39,7 +39,7 @@ Resources:
       Runtime: python3.8
       Layers:
         - !Ref MyLayer
-        - !Sub "arn:aws:lambda:${AWS::Region}:${MyAccountB}:layer:MyLibLayer:4" # example of import layer from another account
+        - !Ref MyLibLayer
   ######################################################################################################################
   # Lambda Layer sharing permission with another account
   ######################################################################################################################
