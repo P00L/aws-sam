@@ -1,0 +1,66 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample lambda layer application
+
+Parameters:
+  MyAccountB:
+      Description: 'Production account ID to share Lambda layer'
+      Type: String
+
+Resources:
+  ######################################################################################################################
+  # Simple layer with custom code
+  ######################################################################################################################
+  MyLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: my_layer
+      CompatibleRuntimes:
+        - python3.8
+  ######################################################################################################################
+  # Layer with build capabilities, automatically execute pip install -r requirements.txt -t installing libraries
+  ######################################################################################################################
+  MyLibLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: my_lib_layer
+      CompatibleRuntimes:
+        - python3.8
+    Metadata:
+      BuildMethod: python3.8 # this is where magic happen, sam build command will read requirements.txt file and download libraries
+  ######################################################################################################################
+  # Lambda function using MyLayer and MyLibLayer
+  ######################################################################################################################
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello_world/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Layers:
+        - !Ref MyLayer
+        - !Sub "arn:aws:lambda:${AWS::Region}:${MyAccountB}:layer:MyLibLayer:4" # example of import layer from another account
+  ######################################################################################################################
+  # Lambda Layer sharing permission with another account
+  ######################################################################################################################
+  MyLibLayerPermission:
+    Type: AWS::Lambda::LayerVersionPermission
+    Properties:
+      Action: lambda:GetLayerVersion
+      LayerVersionArn: !Ref MyLibLayer
+      Principal: !Ref MyAccountB
+
+########################################################################################################################
+# Outputs and export will help to retrieve lambda layer from other AWS SAM tamplate
+########################################################################################################################
+Outputs:
+  MyLayerArn:
+    Description: "Common function Layer"
+    Value: !Ref MyLayer
+    Export:
+      Name: !Sub '${AWS::StackName}-MyLayerArn'
+  MyLibLayer:
+    Description: "Layer containing following libraries: boto3[1.17.56]"
+    Value: !Ref MyLayer
+    Export:
+      Name: !Sub '${AWS::StackName}-MyLibLayer'
