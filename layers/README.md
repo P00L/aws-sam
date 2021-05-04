@@ -1,6 +1,6 @@
 # A practical guide surviving to AWS SAM part 3 - Lambda Layers
 
-[Medium article]()
+[Medium article](https://link.medium.com/ehzuP07SYfb )
 
 This folder contains resources about Lambda Layers.
 
