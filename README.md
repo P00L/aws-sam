@@ -9,7 +9,7 @@ playing with it you will not be able to stop.
 
 But I don't want to dwell on other details so let's start.
 
-- [Part 1](sam/README.md) basics of AWS SAM | [Medium article](https://aws.plainenglish.io/in-this-series-ill-try-explain-how-to-survive-to-aws-sam-don-t-get-me-wrong-i-really-like-this-3c1ff2dfca68?sk=4c285b5078d87c927ff72f718021d5d5)
+- [Part 1](sam) basics of AWS SAM | [Medium article](https://aws.plainenglish.io/in-this-series-ill-try-explain-how-to-survive-to-aws-sam-don-t-get-me-wrong-i-really-like-this-3c1ff2dfca68?sk=4c285b5078d87c927ff72f718021d5d5)
 - [Part 2]() Cloud Native reflections |  [Medium article](https://aws.plainenglish.io/a-practical-guide-surviving-to-aws-sam-part-2-332c2e0c0c68)
 - [Part 3](layers)  Lambda Layers | [Medium article](https://link.medium.com/ehzuP07SYfb )
 
