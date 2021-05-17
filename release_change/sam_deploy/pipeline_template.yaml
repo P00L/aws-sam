@@ -1,0 +1,163 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  AppName:
+    Type: String
+    Default: sam-deploy
+
+Resources:
+  ######################################################################################################################
+  # CodeCommit repository
+  ######################################################################################################################
+  MyRepo:
+    Type: AWS::CodeCommit::Repository
+    Properties:
+      RepositoryName: !Ref AppName
+
+  ######################################################################################################################
+  # CodeBuild role
+  ######################################################################################################################
+  CodeBuildServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codebuild.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - cloudformation:*
+                  - iam:*
+                  - lambda:*
+                  - ssm:*
+                  - apigateway:*
+                  - codepipeline:*
+                  - codebuild:*
+              - Resource: !Sub arn:aws:s3:::${ArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:GetObject
+                  - s3:PutObject
+                  - s3:GetObjectVersion
+
+  ######################################################################################################################
+  # CodePipeline role
+  ######################################################################################################################
+  CodePipelineServiceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: codepipeline.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource:
+                  - !Sub arn:aws:s3:::${ArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - codebuild:StartBuild
+                  - codebuild:BatchGetBuilds
+                  - iam:*
+                  - codecommit:*
+
+  ######################################################################################################################
+  # S3 artifact bucket
+  ######################################################################################################################
+  ArtifactBucket:
+    Type: AWS::S3::Bucket
+
+  ######################################################################################################################
+  # CodeBuild
+  ######################################################################################################################
+  CodeBuildProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Image: aws/codebuild/amazonlinux2-x86_64-standard:3.0
+        Type: LINUX_CONTAINER
+        # This variables will be used by buildspec.yaml file
+        EnvironmentVariables:
+          - Name: S3Bucket
+            Value: !Ref ArtifactBucket
+          - Name: APP_NAME
+            Value: !Ref AppName
+      Name: !Ref AWS::StackName
+      ServiceRole: !Ref CodeBuildServiceRole
+
+  ######################################################################################################################
+  # CodePipeline
+  ######################################################################################################################
+  Pipeline:
+    Type: AWS::CodePipeline::Pipeline
+    Properties:
+      RoleArn: !GetAtt CodePipelineServiceRole.Arn
+      ArtifactStore:
+        Type: S3
+        Location: !Ref ArtifactBucket
+      Stages:
+        - Name: Source
+          Actions:
+            - Name: !GetAtt MyRepo.Name
+              ActionTypeId:
+                Category: Source
+                Owner: AWS
+                Version: "1"
+                Provider: CodeCommit
+              Configuration:
+                RepositoryName: !GetAtt MyRepo.Name
+                BranchName: master
+              OutputArtifacts:
+                - Name: SourceCode
+              RunOrder: 1
+        - Name: Build-Deploy
+          Actions:
+            - Name: Build-Deploy
+              ActionTypeId:
+                Category: Build
+                Owner: AWS
+                Version: "1"
+                Provider: CodeBuild
+              Configuration:
+                ProjectName: !Ref CodeBuildProject
+              InputArtifacts:
+                - Name: SourceCode
+              OutputArtifacts:
+                - Name: BuildOutput
+              RunOrder: 1
+
+Outputs:
+  PipelineUrl:
+    Value: !Sub https://console.aws.amazon.com/codepipeline/home?region=${AWS::Region}#/view/${Pipeline}

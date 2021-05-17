@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  build:
+    commands:
+      - echo start build
+      - sam package --s3-bucket $S3Bucket --output-template-file package.yaml
+      - echo start deploy
+      - sam deploy --template-file package.yaml --stack-name $APP_NAME --capabilities CAPABILITY_IAM
+
+artifacts:
+  type: zip
+  files:
+    - package.yaml

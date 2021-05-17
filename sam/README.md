@@ -1,6 +1,6 @@
 # A practical guide surviving to AWS SAM part 1
 
-[Medium article](https://aws.plainenglish.io/in-this-series-ill-try-explain-how-to-survive-to-aws-sam-don-t-get-me-wrong-i-really-like-this-3c1ff2dfca68?sk=4c285b5078d87c927ff72f718021d5d5)
+[Medium article](https://aws.plainenglish.io/in-this-series-ill-try-explain-how-to-survive-to-aws-sam-don-t-get-me-wrong-i-really-like-this-3c1ff2dfca68?source=friends_link&sk=4c285b5078d87c927ff72f718021d5d5)
 
 In this first part we will se the basics of AWS SAM and how to rapidly get started with it. I will use Python 3.7 and Pycharm IDE.
 
