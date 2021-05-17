@@ -10,7 +10,7 @@ playing with it you will not be able to stop.
 But I don't want to dwell on other details so let's start.
 
 - [Part 1](sam) Basics of AWS SAM | [Medium article](https://aws.plainenglish.io/in-this-series-ill-try-explain-how-to-survive-to-aws-sam-don-t-get-me-wrong-i-really-like-this-3c1ff2dfca68?source=friends_link&sk=4c285b5078d87c927ff72f718021d5d5)
-- [Part 2]() Cloud Native reflections |  [Medium article](https://aws.plainenglish.io/a-practical-guide-surviving-to-aws-sam-part-2-332c2e0c0c68?source=friends_link&sk=248fe1154a8068cf1554b9dfcda08f1a)
+- Part 2 Cloud Native reflections |  [Medium article](https://aws.plainenglish.io/a-practical-guide-surviving-to-aws-sam-part-2-332c2e0c0c68?source=friends_link&sk=248fe1154a8068cf1554b9dfcda08f1a)
 - [Part 3](layers)  Lambda Layers | [Medium article](https://aws.plainenglish.io/a-practical-guide-surviving-aws-sam-part-3-lambda-layers-8a55eb5d2cbe?source=friends_link&sk=26197a231ee55de2f4ee63ea7f1032f0)
 - [Part 4](release_change) Release Change CI/CD pipeline | [Medium article]()
 
