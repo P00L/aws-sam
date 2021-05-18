@@ -1,6 +1,6 @@
 # A practical guide surviving to AWS SAM part 4 - Release Change
 
-[Medium article]()
+[Medium article](https://fusari-pool.medium.com/a-practical-guide-to-surviving-aws-sam-9a1070c8b3e8)
 
 This folder contains resources about CodePipeline Release Change for AWS SAM. 
 
