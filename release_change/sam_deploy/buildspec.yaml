@@ -7,9 +7,9 @@ phases:
   build:
     commands:
       - echo start build
-      - sam package --s3-bucket $S3Bucket --output-template-file package.yaml
+      - sam build
       - echo start deploy
-      - sam deploy --template-file package.yaml --stack-name $APP_NAME --capabilities CAPABILITY_IAM
+      - sam deploy --s3-bucket $S3Bucket --stack-name $APP_NAME --capabilities CAPABILITY_IAM
 
 artifacts:
   type: zip
