@@ -1,0 +1,90 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Sample parameter handling with SAM
+
+Globals:
+  Function:
+    Timeout: 5
+
+Parameters:
+  Env:
+    Type: String
+    AllowedValues:
+      - dev
+      - test
+      - prod
+    Description: Environment in which the application will be deployed. Allowed values [dev, test, prod]
+  VpcSubnet:
+    Type: AWS::SSM::Parameter::Value<List<AWS::EC2::Subnet::Id>>
+    Description: SSM Parameter store key of type StringList with the list of VPC Subnet to be used by Lambda function
+    Default: /MyVpcSubnet
+  VpcSg:
+    Type: AWS::SSM::Parameter::Value<AWS::EC2::SecurityGroup::Id>
+    Description: SSM Parameter store key of type String with the VPC Security Group to be used by Lambda function
+    Default: /MyVpcSg
+  MySSMParameter:
+    Type: AWS::SSM::Parameter::Value<String>
+    Description: SSM Parameter store key of type String with custom parameter to be passed as env var to Lambda function
+    Default: /MyParameter
+  LogLevel:
+    Type: String
+    AllowedValues:
+      - INFO
+      - DEBUG
+    Default: DEBUG
+    Description: log level to be set on Lambda function
+
+# Set log level base on Environment
+Mappings:
+  EnvMapping:
+    dev:
+      LogLevelMapping: DEBUG
+    test:
+      LogLevelMapping: DEBUG
+    prod:
+      LogLevelMapping: INFO
+
+# Set log level based on Environment
+Conditions:
+  # Condition will be true if Env parameter not equal to "prod"
+  HasDebugEnabled: !Not [ !Equals [ !Ref Env, 'prod' ] ]
+
+Resources:
+  HelloWorldFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: hello_world/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      # Environment variables passed to Lambda function
+      Environment:
+        Variables:
+          ENV: !Ref Env
+          MY_SSM_PARAMETER: !Ref MySSMParameter
+          MY_SSM_PARAMETER_RESOLVE: "{{resolve:ssm:/MyParameter:1}}" # you can explicitly specify version number of parameter
+          MY_SECRET: "{{resolve:secretsmanager:MySecret:SecretString:MySecret}}"
+          LOG_LEVEL: !Ref LogLevel
+          LOG_LEVEL_MAPPING: !FindInMap [ EnvMapping, !Ref Env, LogLevelMapping ]
+          LOG_LEVEL_CONDITION: !If [ HasDebugEnabled, 'DEBUG', 'INFO' ]
+      VpcConfig:
+        SubnetIds: !Ref VpcSubnet
+        SecurityGroupIds:
+          - !Ref VpcSg
+      # Policy grant access to SSM Parameter Store from Lambda function
+      Policies:
+        - SSMParameterReadPolicy:
+            ParameterName: "MyParameter"
+      Events:
+        HelloWorld:
+          Type: Api
+          Properties:
+            Path: /hello
+            Method: get
+
+Outputs:
+  HelloWorldApi:
+    Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+  HelloWorldFunction:
+    Description: "Hello World Lambda Function ARN"
+    Value: !GetAtt HelloWorldFunction.Arn
