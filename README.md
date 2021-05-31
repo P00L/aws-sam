@@ -13,7 +13,7 @@ But I don't want to dwell on other details so let's start.
 - Part 2 Cloud Native reflections |  [Medium article](https://aws.plainenglish.io/a-practical-guide-surviving-to-aws-sam-part-2-332c2e0c0c68?source=friends_link&sk=248fe1154a8068cf1554b9dfcda08f1a)
 - [Part 3](layers)  Lambda Layers | [Medium article](https://aws.plainenglish.io/a-practical-guide-surviving-aws-sam-part-3-lambda-layers-8a55eb5d2cbe?source=friends_link&sk=26197a231ee55de2f4ee63ea7f1032f0)
 - [Part 4](release_change) Release Change CI/CD pipeline | [Medium article](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-9a1070c8b3e8?source=friends_link&sk=eb969cfaaf5aecc9048875afdda3942e)
-- [Part 5](parameters) Manage parameters with AWS SAM | [Medium article]()
+- [Part 5](parameters) Manage parameters with AWS SAM | [Medium article](https://fusari-pool.medium.com/a-practical-guide-to-surviving-aws-sam-d8ab141b3d25)
 
 coming soon: 
 - Git Flow release change  pipeline
