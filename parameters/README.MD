@@ -1,6 +1,6 @@
 # A practical guide surviving to AWS SAM part 5 - Parameters
 
-[Medium article](https://fusari-pool.medium.com/a-practical-guide-to-surviving-aws-sam-d8ab141b3d25)
+[Medium article](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-d8ab141b3d25?source=friends_link&sk=f0d787fbe47ed8f9d89ac150494583f9)
 
 This folder contains an example template containing various method to handle parameters in AWS SAM
 
