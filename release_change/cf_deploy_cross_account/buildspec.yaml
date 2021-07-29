@@ -1,0 +1,17 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  build:
+    commands:
+      - echo start build
+      - sam build
+      - echo start package
+      - sam package --s3-bucket $S3Bucket --output-template-file package.yaml
+
+artifacts:
+  type: zip
+  files:
+    - package.yaml

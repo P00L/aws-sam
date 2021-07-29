@@ -10,8 +10,3 @@ phases:
       - sam build
       - echo start deploy
       - sam deploy --s3-bucket $S3Bucket --stack-name $APP_NAME --capabilities CAPABILITY_IAM
-
-artifacts:
-  type: zip
-  files:
-    - package.yaml

@@ -1,0 +1,68 @@
+AWSTemplateFormatVersion: 2010-09-09
+
+Parameters:
+  ArtifactBucket:
+    Type: String
+  ToolAccountId:
+    Type: String
+  CMKARN:
+    Type: String
+
+Resources:
+  ######################################################################################################################
+  # CloudFormation deployer role assumed by CodeBuild on Tool Account
+  ######################################################################################################################
+  DeployerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      Path: /
+      RoleName: deployer
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - cloudformation.amazonaws.com
+            Action: sts:AssumeRole
+          # Granting permission to Tool Account to assume this role
+          - Effect: Allow
+            Principal:
+              AWS:
+                - !Ref ToolAccountId
+            Action:
+              - sts:AssumeRole
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Resource:
+                  - !Sub arn:aws:s3:::${ArtifactBucket}/*
+                Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:GetObjectVersion
+                  - s3:GetBucketVersioning
+              - Resource: "*"
+                Effect: Allow
+                Action:
+                  - logs:CreateLogGroup
+                  - logs:CreateLogStream
+                  - logs:PutLogEvents
+                  - cloudformation:*
+                  - iam:*
+                  - lambda:*
+                  - ssm:*
+                  - apigateway:*
+                  - codepipeline:*
+                  - codebuild:*
+        - PolicyName: kms
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - kms:*
+                Resource: !Ref CMKARN

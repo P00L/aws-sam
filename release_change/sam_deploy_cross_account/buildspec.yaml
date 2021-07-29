@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      python: 3.8
+  build:
+    commands:
+      - ROLE_ARN=arn:aws:iam::$DeployAccountId:role/deployer
+      - echo getting AWS credentials for "$ROLE_ARN"
+      - |
+        CREDENTIAL=$(aws sts assume-role \
+          --role-arn "$ROLE_ARN" \
+          --role-session-name TFsession \
+          --output text \
+          --query 'Credentials.[AccessKeyId,SecretAccessKey,SessionToken,Expiration]')
+      - export AWS_ACCESS_KEY_ID=$(echo $CREDENTIAL | awk '{print $1}')
+      - export AWS_SECRET_ACCESS_KEY=$(echo $CREDENTIAL | awk '{print $2}')
+      - export AWS_SESSION_TOKEN=$(echo $CREDENTIAL | awk '{print $3}')
+      - export SESSION_EXPIRATION=$(echo $CREDENTIAL | awk '{print $4}')
+      - echo start build
+      - sam build
+      - echo start deploy
+      - sam deploy --s3-bucket $S3Bucket --stack-name $APP_NAME --capabilities CAPABILITY_IAM

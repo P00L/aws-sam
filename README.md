@@ -14,10 +14,10 @@ But I don't want to dwell on other details so let's start.
 - [Part 3](layers)  Lambda Layers | [Medium article](https://aws.plainenglish.io/a-practical-guide-surviving-aws-sam-part-3-lambda-layers-8a55eb5d2cbe?source=friends_link&sk=26197a231ee55de2f4ee63ea7f1032f0)
 - [Part 4](release_change) Release Change CI/CD pipeline | [Medium article](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-9a1070c8b3e8?source=friends_link&sk=eb969cfaaf5aecc9048875afdda3942e)
 - [Part 5](parameters) Manage parameters with AWS SAM | [Medium article](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-d8ab141b3d25?source=friends_link&sk=f0d787fbe47ed8f9d89ac150494583f9)
+- [Part 6](release_change) Cross Account Release Change CI/CD pipeline | [Medium article]()
 
 coming soon: 
 - Git Flow release change  pipeline
-- Cross account release change pipeline
 - Test execution
 - Release change pipeline test execution  
 - CRUD example Fargate/Kubernetes vs lambda 
