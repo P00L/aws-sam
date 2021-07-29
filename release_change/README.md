@@ -25,9 +25,9 @@ CodePipeline
 Pipeline with build package and deploy performed by CodeBuild. Application will be deployed to a different account where 
 resources are created
 
-![sam deploy ross account diagram](images/sam-deploy-cross-account-diagram.png)
+![sam deploy cross account diagram](images/sam-deploy-cross-account-diagram.png)
 
-![sam deploy ross account](images/sam-deploy-cross-account.png)
+![sam deploy cross account](images/sam-deploy-cross-account.png)
 
 ## [CloudFormation deploy cross account](cf_deploy_cross_account)
 
