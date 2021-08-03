@@ -1,7 +1,7 @@
 # A practical guide surviving to AWS SAM part 4 - Release Change
 
 * [Medium article single account](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-9a1070c8b3e8?source=friends_link&sk=eb969cfaaf5aecc9048875afdda3942e)
-* [Medium article cross account]()
+* [Medium article cross account](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-2249f9475055?source=friends_link&sk=6083805cddbdc75e4d43977200a10f8f)
 
 This folder contains resources about CodePipeline Release Change for AWS SAM. 
 
