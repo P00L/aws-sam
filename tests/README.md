@@ -1,6 +1,6 @@
 # A practical guide surviving to AWS SAM part 7 - Tests
 
-[Medium article]()
+[Medium article](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-acc7bd39e505)
 
 This folder contains resources about Lambda Tests.
 
