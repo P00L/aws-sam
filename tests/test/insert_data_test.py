@@ -37,6 +37,6 @@ def test_insert_data(lambda_context):
 
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table(TABLE_NAME)
-    response_secret = table.get_item(Key={"id": json.loads(response_lambda["body"])["data_id"]})
+    response_data = table.get_item(Key={"id": json.loads(response_lambda["body"])["data_id"]})
 
-    assert response_secret["Item"]["my_data"] == "this is a sample data"
+    assert response_data["Item"]["my_data"] == "this is a sample data"

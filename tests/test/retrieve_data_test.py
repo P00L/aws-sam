@@ -53,7 +53,7 @@ def setup():
     table.delete_item(Key={"id": "test"})
 
 
-def test_success(lambda_context):
+def test_retrieve_lambda(lambda_context):
     f = open("events/RetrieveData.json", "r")
     event = json.loads(f.read())
 
@@ -61,7 +61,7 @@ def test_success(lambda_context):
     assert response_lambda["statusCode"] == 200
 
 
-def test_stub_dynamo(lambda_context):
+def test_retrieve_lambda_stub(lambda_context):
     f = open("events/RetrieveData.json", "r")
     event = json.loads(f.read())
 
@@ -71,10 +71,10 @@ def test_stub_dynamo(lambda_context):
     stubber.add_response(
         'get_item', {
             'Item':
-                {'secret':
-                     {'S': 'secret'},
-                 'password':
-                     {'S': 'password'}
+                {'id':
+                     {'S': 'test'},
+                 'my_data':
+                     {'S': 'this is a sample data'}
                  }}
     )
 
