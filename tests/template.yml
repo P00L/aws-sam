@@ -1,0 +1,71 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: test example
+
+Globals:
+  Function:
+    Timeout: 3
+    Tracing: Active
+    Runtime: python3.8
+    Handler: app.lambda_handler
+    Layers:
+      - !Ref SharedLib
+    Environment:
+      Variables:
+        TABLE_NAME: !Ref DataTable
+
+Resources:
+  DataTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+
+  RetrieveData:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: retrieve_data/
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref DataTable
+      Events:
+        RetrieveData:
+          Type: HttpApi
+          Properties:
+            Path: /data/{id}
+            Method: get
+
+  InsertData:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: insert_data/
+      Policies:
+        - DynamoDBWritePolicy:
+            TableName: !Ref DataTable
+      Events:
+        InsertData:
+          Type: HttpApi
+          Properties:
+            Path: /data
+            Method: post
+
+  SharedLib:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      ContentUri: layer
+      CompatibleRuntimes:
+        - python3.8
+    Metadata:
+      BuildMethod: python3.8
+
+Outputs:
+  ApiUrl:
+    Description: "API Gateway endpoint URL"
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"

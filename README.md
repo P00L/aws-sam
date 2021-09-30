@@ -15,6 +15,7 @@ But I don't want to dwell on other details so let's start.
 - [Part 4](release_change) Release Change CI/CD pipeline | [Medium article](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-9a1070c8b3e8?source=friends_link&sk=eb969cfaaf5aecc9048875afdda3942e)
 - [Part 5](parameters) Manage parameters with AWS SAM | [Medium article](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-d8ab141b3d25?source=friends_link&sk=f0d787fbe47ed8f9d89ac150494583f9)
 - [Part 6](release_change) Cross Account Release Change CI/CD pipeline | [Medium article](https://aws.plainenglish.io/a-practical-guide-to-surviving-aws-sam-2249f9475055?source=friends_link&sk=6083805cddbdc75e4d43977200a10f8f)
+- [Part 7](tests) Tests | [Medium article]()
 
 coming soon: 
 - Git Flow release change  pipeline

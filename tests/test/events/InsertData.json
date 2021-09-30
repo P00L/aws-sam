@@ -1,0 +1,6 @@
+{
+  "version": "2.0",
+  "routeKey": "POST /data",
+  "rawPath": "/data",
+  "body": "{\"my_data\" : \"this is a sample data\"}"
+}
