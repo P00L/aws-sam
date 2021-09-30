@@ -36,9 +36,9 @@ def setup():
     dynamodb = boto3.resource("dynamodb")
     table = dynamodb.Table(TABLE_NAME)
 
-    response_secret = table.get_item(Key={"id": "test"})
+    response_data = table.get_item(Key={"id": "test"})
 
-    if "Item" in response_secret:
+    if "Item" in response_data:
         table.delete_item(Key={"id": "test"})
 
     table.put_item(
